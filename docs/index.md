@@ -3,8 +3,8 @@
 1. Go安装与环境配置
 2. [如何编写Go代码](how_to_write_go_code.md)
 3. Language Specification
-4. Effective Go <---
-5. [Package Documentation](std_package.md)
+4. Effective Go
+5. [Package Documentation](std_package.md) <----
 6. Command Documentaion
 7. The Go Memory Model
 

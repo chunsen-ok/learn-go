@@ -1,5 +1,15 @@
 ## The Standard Go Packages
 
+- io
+
+    io包提供基本的I/O操作功能。
+
+    Reader, Writer接口。
+
+- io/ioutil
+
+    ioutil实现了一些常用I/O工具函数。文件、路径操作。
+
 - fmt
 - builtin
 - bufio
@@ -10,7 +20,6 @@
 - bytes
 - container
 - errors
-- io
 - math
 - os
 - sort
