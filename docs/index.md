@@ -1,6 +1,6 @@
 [TOC]
 
-1. Go安装与环境配置
+1. [Go安装与环境配置](install_and_configure.md)
 2. [如何编写Go代码](how_to_write_go_code.md)
 3. Language Specification
 4. Effective Go
