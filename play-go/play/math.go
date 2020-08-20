@@ -4,7 +4,7 @@ package play
 type Pos struct {
 	X float64
 	Y float64
-	Y float64
+	Z float64
 }
 
 // NewPos Pos构造函数
