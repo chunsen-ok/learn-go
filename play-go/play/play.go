@@ -79,7 +79,7 @@ type Backend struct {
 	operate int
 }
 
-func NewBackend() Backend {
+func newBackend() Backend {
 	return Backend {
 		operate: EVAL,
 	}

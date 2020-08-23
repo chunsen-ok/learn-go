@@ -6,12 +6,22 @@
 package main
 
 import (
-	_ "fmt"
-	"github.com/LCSyy/play-go/play"
+	"fmt"
+	_ "github.com/LCSyy/play-go/play"
 )
 
-func main() {
-	app := play.NewApp()
-	app.Run()
+type One struct {
+	tableName struct {} `pg:"TableName"`
+	id int64
+	name string
 }
 
+func main() {
+	// app := play.NewApp()
+	// app.Run()
+	o := One {
+		id: 12314324,
+		name: "sfsdf",
+	}
+	fmt.Printf("%+v",o)
+}
