@@ -422,22 +422,28 @@ const (
 	index_corrupted = "XX002"
 )
 
-const db_err_str = ""
+// const db_err_str = ""
 
 func main() {
-	lines := strings.Split(db_err_str, "\n")
-	for _, val := range lines {
-		code_and_info := strings.Split(val, "\t")
-		if len(code_and_info) == 2 {
-			fmt.Printf("%v = \"%v\"\n", code_and_info[1], code_and_info[0])
-		} else {
-			fmt.Printf(")\n\n// %v\nconst (\n", code_and_info[0])
-		}
-	}
+	// lines := strings.Split(db_err_str, "\n")
+	// for _, val := range lines {
+	// 	code_and_info := strings.Split(val, "\t")
+	// 	if len(code_and_info) == 2 {
+	// 		fmt.Printf("%v = \"%v\"\n", code_and_info[1], code_and_info[0])
+	// 	} else {
+	// 		fmt.Printf(")\n\n// %v\nconst (\n", code_and_info[0])
+	// 	}
+	// }
 
-	dbErrToUta("Error #P0002 this is a error")
+	fmt.Println(dbErrToUta("Error #P0002 this is a #What error"))
 }
 
-func dbErrToUta(err string) {
-
+func dbErrToUta(err string) string {
+	idx := strings.IndexByte(err, '#')
+	var errCode string
+	if idx != -1 {
+		idx += 1
+		errCode = err[idx : idx+5]
+	}
+	return errCode
 }
