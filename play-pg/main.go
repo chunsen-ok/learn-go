@@ -9,87 +9,101 @@ package main
 
 import (
 	"fmt"
-	_ "fmt"
 	"log"
 
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
-
-	mdb "play-pg/db"
 )
 
+type MyUser struct {
+    Id int64
+    Name string
+    Account string
+    Password string
+    Comment string
+    Protect []Protect
+    Action Action
+}
+
+type Protect struct {
+    Subject string
+    Answer string
+}
+
+type Action struct {
+    CreateTime string
+    ModifyTime []string
+}
+
 func main() {
-	option := mdb.IndividualLocalConnection()
-	db := pg.Connect(&option)
-	defer func() {
-		fmt.Println("Defer call")
-		db.Close()
-	}()
+    options := pg.Options {
+        Addr: "127.0.0.1:5432",
+        User: "postgres",
+        Password: "pg2020",
+        Database: "postgres",
+    }
+    db := pg.Connect(&options)
+    defer db.Close()
 
-	if err := db.Ping(db.Context()); err != nil {
-		log.Fatal("")
-	}
+    if err := db.Ping(db.Context()); err != nil {
+        log.Println("Can't ping db: ", err)
+    }
 
-	if err := createTable(db); err != nil {
-		log.Fatal("What:", err)
-	}
+    ///////// Create Table ///////////////
 
-	// if data, err := query(db); err != nil {
-	// 	goto Finish
-	// } else {
-	// 	fmt.Println(data)
-	// }
+    ctOptions := orm.CreateTableOptions {
+        IfNotExists: true,
+    }
+    if err := db.Model((*MyUser)(nil)).CreateTable(&ctOptions); err != nil {
+        log.Println("Create table error: ", err)
+    }
 
-	lst := make([]mdb.Account, 0)
+    ////////// Exec Queries //////////////
 
-	lst = append(lst, mdb.Account{
-		Id:      23434,
-		Account: "nobody",
-	})
-	lst = append(lst, mdb.Account{
-		Id:      354343,
-		Account: "somebody",
-	})
+    data := MyUser {
+        Name: "lcs",
+        Account: "chuns.liu@foxmail.com",
+        Password: "WhatIs_wrong_7512",
+        Comment: "This is my test account. It's do nothing.",
+        Protect: []Protect {
+            Protect {
+                Subject: "When create this account?",
+                Answer: "2020-09-06 08:39:00",
+            },
+        },
+        Action: Action {
+            CreateTime: "2020-09-06 08:39:00",
+        },
+    }
 
-	Jobs(&lst)
+    /*
+    _, err := db.Model(&data).Insert()
+    if err != nil {
+        log.Println("Insert my_user error: ", err)
+    }
+    */
+
+    tx, err := db.Begin()
+    if err != nil {
+        log.Println("Begin Tx error: ", err)
+    }
+
+    count, err := tx.Model((*MyUser)(nil)).Count()
+    if err != nil {
+        log.Println("Select count error: ", err)
+        tx.Rollback()
+    }
+
+    if count > 0 {
+        fmt.Println("Count is: ", count)
+    }
+
+    _, err = tx.Model(&data).Insert()
+    if err != nil {
+        log.Println("Insert data error: ", err)
+        tx.Rollback()
+    }
+
+    tx.Commit()
 }
 
-func createTable(db *pg.DB) error {
-	option := orm.CreateTableOptions{
-		IfNotExists: true,
-	}
-
-	err := db.Model((*mdb.Account)(nil)).CreateTable(&option)
-	if err != nil {
-		return err
-	}
-
-	err = db.Model((*mdb.CorpCertificate)(nil)).CreateTable(&option)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS user_info(
-		id serial not null,
-		name varchar(255) not null,
-		age int4
-	);
-	COMMENT ON COLUMN public.user_info.name IS '用户名称';`)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func query(db *pg.DB) (mdb.Account, error) {
-	model := mdb.Account{}
-	_, err := db.QueryOne(&model, "SELECT id FROM accounts;")
-	return model, err
-}
-
-func Jobs(lst *[]mdb.Account) {
-	for _, val := range *lst {
-		fmt.Println("Value: ", val)
-	}
-}

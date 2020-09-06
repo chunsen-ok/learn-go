@@ -1,33 +1,25 @@
 /*
-基础 standard package：
-	builtin
-	fmt
+go standard package
+	builtin V
+	fmt V
+	errors V
+	strings
+	strconv
+	math
+	time
 */
 package main
 
 import (
 	"fmt"
-	"time"
+	"strings"
 )
 
-type MyTime time.Time
-
-func (self MyTime) MarshalJSON() ([]byte, error) {
-	return nil, nil
-}
-
 func main() {
-	var name string = fmt.Sprintf("%%%v%%", "This is name")
-
-	if len(name) > 0 {
-		fmt.Println(name)
-	}
-
-	if name != "" {
-		fmt.Println(name)
-	}
-
-	filters := []string{"s", "3"}
-
-	fmt.Println(filters)
+	s := "abcabc"
+	ss := "abc"
+	fmt.Println(strings.Count(s,ss))
+	fmt.Println(strings.EqualFold("Ab","aB"))
+	fmt.Println(strings.Fields("This is a word"))
 }
+
