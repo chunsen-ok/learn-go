@@ -101,13 +101,14 @@ func linuxReload(pkg string) {
 }
 
 func windowsReload(pkg string) {
-	// executable, _ := os.Executable()
-	// os.Rename(executable, "_deprecated.exe")
+	executable, _ := os.Executable()
+	os.Rename(executable, "_deprecated.exe")
 
-	// unzip := exec.Command("unzip", destFile, "-d", ".")
-	// unzip.Run()
+	unzip := exec.Command("unzip", pkg, "-d", ".")
+	unzip.Run()
 
-	// os.Remove("other.exe")
+	os.Remove("_deprecated.exe")
+
 	// sc := exec.Command("net", "stop", "play-gin")
 	// sc.Start()
 	// sc = exec.Command("sc", "start", "play-gin")
