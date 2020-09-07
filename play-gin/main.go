@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	VER = "v0.0.12"
+	VER = "v0.0.13"
 	dst = "./upgrade_pkg"
 )
 
@@ -90,7 +90,8 @@ func upload(c *gin.Context) {
 }
 
 func linuxReload(pkg string) {
-	os.Remove("./play-gin")
+	e, _ := os.Executable()
+	os.Remove(e)
 
 	unzip := exec.Command("unzip", pkg, "-d", ".")
 	unzip.Run()
