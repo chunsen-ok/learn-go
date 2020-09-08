@@ -11,22 +11,40 @@ go standard package
 package main
 
 import (
+	"archive/zip"
 	_ "bytes"
+	"flag"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
-	"io/ioutil"
-	"io"
-	"fmt"
-	"strings"
-	"archive/zip"
 	"path/filepath"
+	"strings"
 )
 
-func main() {
-	files := []string{"go.sum","play-go.exe","main.go","go.mod", "play/play.go" }
-	compress("zz.zip", files)
+var src = flag.String("src", "", "src path to zip")
 
-	decompress("zz.zip")
+func main() {
+	flag.Parse()
+
+	if len(*src) == 0 {
+		log.Fatal("No input.")
+	}
+
+	var files []string
+	filepath.Walk(*src, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			fmt.Println("find: ", path)
+			files = append(files, path)
+		}
+		return nil
+	})
+
+	fmt.Println(files)
+
+	// compress("zz.zip", files)
+	// decompress("zz.zip")
 }
 
 func compress(dst string, files []string) {
@@ -39,7 +57,7 @@ func compress(dst string, files []string) {
 
 	for _, file := range files {
 		out, err := w.Create(file)
-		if err != nil { 
+		if err != nil {
 			log.Fatal(err)
 		}
 
@@ -62,11 +80,11 @@ func decompress(zFile string) {
 	}
 
 	d := filepath.Base(zFile)
-	db := strings.Split(d,".")
+	db := strings.Split(d, ".")
 	os.Mkdir(db[0], os.ModeDir)
 
 	for _, f := range r.File {
-		log.Println("read file: ",f.Name)
+		log.Println("read file: ", f.Name)
 
 		rc, err := f.Open()
 		if err != nil {
@@ -74,9 +92,9 @@ func decompress(zFile string) {
 		}
 
 		fd := filepath.Dir(f.Name)
-		os.Mkdir(db[0] + "/" + fd, os.ModeDir)
+		os.Mkdir(db[0]+"/"+fd, os.ModeDir)
 
-		fmt.Println("dst:", db[0] + "/" + f.Name)
+		fmt.Println("dst:", db[0]+"/"+f.Name)
 		of, err := os.Create(db[0] + "/" + f.Name)
 		if err != nil {
 			log.Fatal(err)
