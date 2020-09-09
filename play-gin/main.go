@@ -25,6 +25,7 @@ func main() {
 	g.GET("/version", version)
 	g.POST("/home", home)
 	g.POST("/upload", upload)
+	g.POST("/update", update)
 
 	srv := &http.Server{
 		Addr:    "127.0.0.1:9001",
@@ -67,7 +68,7 @@ func home(c *gin.Context) {
 	c.String(http.StatusOK, "Maybe %v", "What's the format purpose?")
 }
 
-func upload(c *gin.Context) {
+func update(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Println("form file error:", err)
@@ -113,4 +114,22 @@ func windowsReload(pkg string) {
 	// sc.Start()
 	// sc = exec.Command("sc", "start", "play-gin")
 	// sc.Start()
+}
+
+func upload(c *gin.Context) {
+	log.Println("header: ", c.GetHeader("Sycc-Update"))
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		log.Println("form file error:", err)
+	}
+
+	os.Mkdir(dst, os.ModeDir)
+	destFile := dst + "/" + file.Filename
+	err = c.SaveUploadedFile(file, destFile)
+	if err != nil {
+		log.Println("save file error: ", err)
+	}
+
+	c.String(http.StatusOK, "upgrade ok!")
 }
