@@ -26,9 +26,10 @@ func main() {
 	g.POST("/home", home)
 	g.POST("/upload", upload)
 	g.POST("/update", update)
+	g.GET("/img", image)
 
 	srv := &http.Server{
-		Addr:    "127.0.0.1:9001",
+		Addr:    "192.168.2.106:9001",
 		Handler: g,
 	}
 
@@ -117,8 +118,6 @@ func windowsReload(pkg string) {
 }
 
 func upload(c *gin.Context) {
-	log.Println("header: ", c.GetHeader("Sycc-Update"))
-
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Println("form file error:", err)
@@ -132,4 +131,13 @@ func upload(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, "upgrade ok!")
+}
+
+func image(c *gin.Context) {
+	fileName := c.Query("img")
+	if len(fileName) == 0 {
+		log.Fatal("no filename")
+	}
+
+	c.File(dst + "/" + fileName)
 }

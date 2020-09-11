@@ -1,3 +1,5 @@
 docs/
 go.sum
 *.exe
+dist/
+
