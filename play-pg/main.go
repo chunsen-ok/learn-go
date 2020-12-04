@@ -16,94 +16,106 @@ import (
 )
 
 type MyUser struct {
-    Id int64
-    Name string
-    Account string
-    Password string
-    Comment string
-    Protect []Protect
-    Action Action
+	Id       int64
+	What     *float64
+	Name     string
+	Account  string
+	Password string
+	Comment  string
+	Protect  []Protect
+	Action   Action
 }
 
 type Protect struct {
-    Subject string
-    Answer string
+	Subject string
+	Answer  string
 }
 
 type Action struct {
-    CreateTime string
-    ModifyTime []string
+	CreateTime string
+	ModifyTime []string
 }
 
 func main() {
-    options := pg.Options {
-        Addr: "127.0.0.1:5432",
-        User: "postgres",
-        Password: "pg2020",
-        Database: "postgres",
-    }
-    db := pg.Connect(&options)
-    defer db.Close()
+	// options := pg.Options{
+	// 	Addr:     "127.0.0.1:5432",
+	// 	User:     "postgres",
+	// 	Password: "pg2020",
+	// 	Database: "postgres",
+	// }
+	// db := pg.Connect(&options)
+	// defer db.Close()
 
-    if err := db.Ping(db.Context()); err != nil {
-        log.Println("Can't ping db: ", err)
-    }
+	// if err := db.Ping(db.Context()); err != nil {
+	// 	log.Println("Can't ping db: ", err)
+	// }
 
-    ///////// Create Table ///////////////
+	// createTable(db)
 
-    ctOptions := orm.CreateTableOptions {
-        IfNotExists: true,
-    }
-    if err := db.Model((*MyUser)(nil)).CreateTable(&ctOptions); err != nil {
-        log.Println("Create table error: ", err)
-    }
+	/*
+		data := MyUser{
+			Id:       1,
+			Name:     "lcs",
+			Account:  "chuns.liu@foxmail.com",
+			Password: "adfasdfadfsasdf",
+		}
 
-    ////////// Exec Queries //////////////
+		_, err := db.Model(&data).Insert()
+		if err != nil {
+			log.Println("Insert my_user error: ", err)
+		}
+	*/
 
-    data := MyUser {
-        Name: "lcs",
-        Account: "chuns.liu@foxmail.com",
-        Password: "WhatIs_wrong_7512",
-        Comment: "This is my test account. It's do nothing.",
-        Protect: []Protect {
-            Protect {
-                Subject: "When create this account?",
-                Answer: "2020-09-06 08:39:00",
-            },
-        },
-        Action: Action {
-            CreateTime: "2020-09-06 08:39:00",
-        },
-    }
-
-    /*
-    _, err := db.Model(&data).Insert()
-    if err != nil {
-        log.Println("Insert my_user error: ", err)
-    }
-    */
-
-    tx, err := db.Begin()
-    if err != nil {
-        log.Println("Begin Tx error: ", err)
-    }
-
-    count, err := tx.Model((*MyUser)(nil)).Count()
-    if err != nil {
-        log.Println("Select count error: ", err)
-        tx.Rollback()
-    }
-
-    if count > 0 {
-        fmt.Println("Count is: ", count)
-    }
-
-    _, err = tx.Model(&data).Insert()
-    if err != nil {
-        log.Println("Insert data error: ", err)
-        tx.Rollback()
-    }
-
-    tx.Commit()
+	// insertData(db)
 }
 
+func createTable(db *pg.DB) {
+	ctOptions := orm.CreateTableOptions{
+		IfNotExists: true,
+	}
+	if err := db.Model((*MyUser)(nil)).CreateTable(&ctOptions); err != nil {
+		log.Println("Create table error: ", err)
+	}
+
+}
+
+func insertData(db *pg.DB) {
+	data := MyUser{
+		Id:       1,
+		Name:     "lcs",
+		Account:  "chuns.liu@foxmail.com",
+		Password: "adfasdfadfsasdf",
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Println("Begin Tx error: ", err)
+	}
+
+	count, err := tx.Model((*MyUser)(nil)).Count()
+	if err != nil {
+		log.Println("Select count error: ", err)
+		tx.Rollback()
+	}
+
+	if count > 0 {
+		fmt.Println("Count is: ", count)
+	}
+
+	_, err = tx.Model(&data).Column("password").WherePK().Update()
+	if err != nil {
+		log.Println("Insert data error: ", err)
+		tx.Rollback()
+		return
+	}
+
+	err = tx.Model(&data).WherePK().Select()
+	if err != nil {
+		log.Println("Select data error: ", err)
+		tx.Rollback()
+		return
+	}
+
+	tx.Commit()
+
+}
